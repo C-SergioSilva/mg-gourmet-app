@@ -1,0 +1,19 @@
+/* nome-do-componente.component.css */
+
+/* Define o caminho para a imagem e garante que ela cubra a área */
+.hero-banner-image {
+    background-image: url('/assets/images/banner2.jpeg'); /* Mude o caminho conforme sua estrutura */
+    background-size: cover; /* Garante que a imagem cubra toda a seção */
+    background-position: center center; /* Centraliza a imagem */
+    background-repeat: no-repeat; /* Evita repetição da imagem */
+    /* Você pode querer remover as cores do Bootstrap se usar imagem */
+    /* Se quiser uma cor de sobreposição, use o 'background-color' junto com um gradiente */
+    background-color: rgba(0, 0, 0, 0.4); /* Fundo preto semi-transparente */
+    background-blend-mode: overlay; /* Combina a cor de fundo com a imagem */
+}
+
+/* Garante que o conteúdo tenha espaço interno, se necessário */
+.hero-banner {
+    /* O padding já está sendo definido pelo Bootstrap py-5, mas você pode reforçar aqui */
+    min-height: 400px; /* Garante uma altura mínima para o banner ser visível */
+}

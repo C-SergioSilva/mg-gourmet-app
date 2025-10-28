@@ -1,0 +1,207 @@
+<!-- Admin Header -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
+  <div class="container">
+    <a routerLink="/" class="navbar-brand">
+      <i class="fas fa-utensils me-2"></i>MG Gourmet - Admin
+    </a>
+    
+    <div class="navbar-nav ms-auto">
+      <span class="navbar-text me-3" *ngIf="currentUser">
+        <i class="fas fa-user me-1"></i>{{ currentUser.name }}
+      </span>
+      <button class="btn btn-outline-light btn-sm" (click)="logout()">
+        <i class="fas fa-sign-out-alt me-1"></i>Logout
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid py-4">
+  <!-- Alerts -->
+  <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="fas fa-check-circle me-2"></i>{{ successMessage }}
+    <button type="button" class="btn-close" (click)="successMessage = ''"></button>
+  </div>
+  
+  <div *ngIf="errorMessage && !showProductForm" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="fas fa-exclamation-triangle me-2"></i>{{ errorMessage }}
+    <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
+  </div>
+
+  <!-- Header Actions -->
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h2><i class="fas fa-cogs me-2 text-primary"></i>Gerenciar Produtos</h2>
+      <p class="text-muted">Gerencie seus produtos Din Din Gourmet</p>
+    </div>
+    <div class="col-md-4 text-md-end">
+      <button 
+        class="btn btn-primary" 
+        (click)="showAddProduct()"
+        [disabled]="showProductForm">
+        <i class="fas fa-plus me-2"></i>Novo Produto
+      </button>
+      <a routerLink="/" class="btn btn-outline-secondary ms-2">
+        <i class="fas fa-home me-1"></i>Ver Site
+      </a>
+    </div>
+  </div>
+
+  <!-- Product Form -->
+  <div *ngIf="showProductForm" class="card mb-4">
+    <div class="card-header bg-primary text-white">
+      <h5 class="mb-0">
+        <i class="fas fa-edit me-2"></i>
+        {{ editingProduct ? 'Editar Produto' : 'Novo Produto' }}
+      </h5>
+    </div>
+    <div class="card-body">
+      <form (ngSubmit)="onSubmitProduct()" #productFormRef="ngForm">
+        <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+          <i class="fas fa-exclamation-triangle me-2"></i>{{ errorMessage }}
+        </div>
+        
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="name" class="form-label">Nome do Produto</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="name" 
+              name="name"
+              [(ngModel)]="productForm.name" 
+              required 
+              placeholder="Digite o nome do produto">
+          </div>
+          
+          <div class="col-md-6 mb-3">
+            <label for="price" class="form-label">Preço (R$)</label>
+            <input 
+              type="number" 
+              class="form-control" 
+              id="price" 
+              name="price"
+              [(ngModel)]="productForm.price" 
+              required 
+              min="0" 
+              step="0.01"
+              placeholder="0.00">
+          </div>
+        </div>
+        
+        <div class="mb-3">
+          <label for="description" class="form-label">Descrição</label>
+          <textarea 
+            class="form-control" 
+            id="description" 
+            name="description"
+            [(ngModel)]="productForm.description" 
+            required 
+            rows="3"
+            placeholder="Descreva o produto..."></textarea>
+        </div>
+        
+        <div class="mb-3">
+          <label for="image" class="form-label">Imagem do Produto</label>
+          <input 
+            type="file" 
+            class="form-control" 
+            id="image" 
+            accept="image/*"
+            (change)="onFileSelected($event)">
+          <div class="form-text">Formatos aceitos: JPG, PNG, GIF (máx. 2MB)</div>
+        </div>
+        
+        <div class="d-flex gap-2">
+          <button 
+            type="submit" 
+            class="btn btn-primary" 
+            [disabled]="loading || !productFormRef.form.valid">
+            <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+            <i *ngIf="!loading" class="fas fa-save me-2"></i>
+            {{ loading ? 'Salvando...' : (editingProduct ? 'Atualizar' : 'Criar Produto') }}
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="cancelForm()">
+            <i class="fas fa-times me-2"></i>Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Products List -->
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0"><i class="fas fa-list me-2"></i>Meus Produtos</h5>
+    </div>
+    <div class="card-body">
+      <!-- Loading State -->
+      <div *ngIf="loading && !showProductForm" class="text-center py-4">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Carregando...</span>
+        </div>
+        <p class="mt-3 text-muted">Carregando produtos...</p>
+      </div>
+      
+      <!-- Empty State -->
+      <div *ngIf="!loading && products.length === 0" class="text-center py-5">
+        <i class="fas fa-utensils fa-3x text-muted mb-3"></i>
+        <h4 class="text-muted">Nenhum produto cadastrado</h4>
+        <p class="text-muted">Clique em "Novo Produto" para começar!</p>
+      </div>
+      
+      <!-- Products Table -->
+      <div *ngIf="!loading && products.length > 0" class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>Imagem</th>
+              <th>Nome</th>
+              <th>Descrição</th>
+              <th>Preço</th>
+              <th>Data</th>
+              <th width="150">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let product of products">
+              <td>
+                <img 
+                  [src]="getImageUrl(product.image)" 
+                  [alt]="product.name"
+                  class="rounded"
+                  style="width: 50px; height: 50px; object-fit: cover;"
+                  (error)="onImageError($event)">
+              </td>
+              <td class="fw-bold">{{ product.name }}</td>
+              <td>
+                <span [title]="product.description">
+                  {{ product.description.length > 50 ? (product.description | slice:0:50) + '...' : product.description }}
+                </span>
+              </td>
+              <td class="fw-bold text-success">{{ formatPrice(product.price) }}</td>
+              <td class="text-muted">
+                {{ product.created_at | date:'short' }}
+              </td>
+              <td>
+                <div class="btn-group btn-group-sm" role="group">
+                  <button 
+                    class="btn btn-outline-primary" 
+                    (click)="editProduct(product)"
+                    [disabled]="showProductForm">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button 
+                    class="btn btn-outline-danger" 
+                    (click)="deleteProduct(product)">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
