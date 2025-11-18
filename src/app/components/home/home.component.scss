@@ -17,3 +17,25 @@
     /* O padding já está sendo definido pelo Bootstrap py-5, mas você pode reforçar aqui */
     min-height: 400px; /* Garante uma altura mínima para o banner ser visível */
 }
+
+.bg-menu {
+    background-color: #e5ddd4;
+ /* Cor de fundo clara para o menu */
+}
+
+.btn-outline-admin {
+    --bs-btn-color: #e36715;
+    --bs-btn-border-color: #e36715;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #e36715;
+    --bs-btn-hover-border-color: #e36715;
+    --bs-btn-focus-shadow-rgb: 108, 117, 125;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #e36715;
+    --bs-btn-active-border-color: #e36715;
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    --bs-btn-disabled-color: #e36715;
+    --bs-btn-disabled-bg: transparent;
+    --bs-btn-disabled-border-color: #e36715;
+    --bs-gradient: none;
+}
